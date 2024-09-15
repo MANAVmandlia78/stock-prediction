@@ -4,6 +4,12 @@ import yfinance as yf
 from prophet import Prophet
 from prophet.plot import plot_plotly
 from plotly import graph_objs as go
+import cmdstanpy
+import os
+
+# Install cmdstan binaries if not already installed
+if not os.path.exists(cmdstanpy.cmdstan_path()):
+    cmdstanpy.install_cmdstan()
 
 START = "2015-01-01"
 TODAY = date.today().strftime("%Y-%m-%d")
@@ -28,14 +34,14 @@ def load_data(ticker):
     except Exception as e:
         return None
 
-# Loading the data for the given stock
-data_load_state = st.text("Loading data...")
-data = load_data(stock_input)
+# Load the data for the given stock
+with st.spinner('Loading data...'):
+    data = load_data(stock_input)
 
 if data is None:
-    data_load_state.text(f"Error: Unable to load data for {stock_input}. Please check the stock symbol.")
+    st.error(f"Error: Unable to load data for {stock_input}. Please check the stock symbol.")
 else:
-    data_load_state.text("Loading data...done!")
+    st.success("Data loaded successfully!")
 
     st.subheader('Raw Data')
     st.write(data.tail())
